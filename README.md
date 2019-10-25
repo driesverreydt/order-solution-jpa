@@ -8,6 +8,8 @@ www.switchfully.com
     - Dependency Management
     - Spring (boot)
     - REST
+    - ORM & JPA
+        - Limited use of Spring Data
 - Contains the basic skeleton of the application (not the full implementation):
     - Multi-module Maven setup
     - Integration test configuration
@@ -23,10 +25,12 @@ www.switchfully.com
         - Jenkins runs as a service (task manager) on Windows
     - Event Publishing with Spring (!)
         - (to update the stock of an item when an order is created in a very decoupled way)
+    - JPA, connected with a postgreSQL database.
 
 ## Usage
 
 ### Running Locally
+- Edit the `application.properties` to connect to your own postgreSQL database.
 - Run `mvn clean install`
 - Multiple ways of running:
     - Inside the target folder of jar, run the `war-1.0-SNAPSHOT.jar` using the `java -jar` command
