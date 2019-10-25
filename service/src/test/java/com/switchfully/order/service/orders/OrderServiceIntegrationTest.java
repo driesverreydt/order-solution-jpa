@@ -8,7 +8,6 @@ import com.switchfully.order.domain.items.ItemRepository;
 import com.switchfully.order.domain.items.prices.Price;
 import com.switchfully.order.domain.orders.Order;
 import com.switchfully.order.domain.orders.OrderRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
@@ -36,13 +35,6 @@ class OrderServiceIntegrationTest extends IntegrationTest {
     @Inject
     private ItemRepository itemRepository;
 
-    @AfterEach
-    void resetDatabase() {
-        orderRepository.reset();
-        customerRepository.reset();
-        itemRepository.reset();
-    }
-
     @Test
     void createOrder() {
         Item existingItem = itemRepository.save(anItem()
@@ -60,16 +52,23 @@ class OrderServiceIntegrationTest extends IntegrationTest {
         Order createdOrder = orderService.createOrder(orderToCreate);
 
         assertThat(createdOrder.getId()).isNotNull();
-        assertThat(createdOrder).isEqualToComparingFieldByFieldRecursively(orderToCreate);
+        assertThat(createdOrder).usingRecursiveComparison().isEqualTo(orderToCreate);
         assertThat(itemRepository.get(existingItem.getId()).getAmountOfStock()).isEqualTo(5);
     }
 
     @Test
     void getAllOrders() {
         Item item = itemRepository.save(anItem().build());
-        Order order1 = orderRepository.save(anOrder().withOrderItems(anOrderItem().withItemId(item.getId()).build()).build());
-        Order order2 = orderRepository.save(anOrder().withOrderItems(anOrderItem().withItemId(item.getId()).build()).build());
-        Order order3 = orderRepository.save(anOrder().withOrderItems(anOrderItem().withItemId(item.getId()).build()).build());
+        Customer customer = customerRepository.save(aCustomer().build());
+        Order order1 = orderRepository.save(anOrder()
+                .withCustomerId(customer.getId())
+                .withOrderItems(anOrderItem().withItemId(item.getId()).build()).build());
+        Order order2 = orderRepository.save(anOrder()
+                .withCustomerId(customer.getId())
+                .withOrderItems(anOrderItem().withItemId(item.getId()).build()).build());
+        Order order3 = orderRepository.save(anOrder()
+                .withCustomerId(customer.getId())
+                .withOrderItems(anOrderItem().withItemId(item.getId()).build()).build());
 
         List<Order> allOrders = orderService.getAllOrders(false);
 
@@ -79,7 +78,10 @@ class OrderServiceIntegrationTest extends IntegrationTest {
     @Test
     void getAllOrders_onlyIncludeShippableToday() {
         Item item = itemRepository.save(anItem().build());
-        Order order1 = orderRepository.save(anOrder().withOrderItems(anOrderItem().withItemId(item.getId()).build()).build());
+        Customer customer = customerRepository.save(aCustomer().build());
+        Order order1 = orderRepository.save(anOrder()
+                .withCustomerId(customer.getId())
+                .withOrderItems(anOrderItem().withItemId(item.getId()).build()).build());
 
         List<Order> allOrders = orderService.getAllOrders(true);
 

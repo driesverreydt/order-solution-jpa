@@ -3,7 +3,6 @@ package com.switchfully.order.service.customers;
 import com.switchfully.order.IntegrationTest;
 import com.switchfully.order.domain.customers.Customer;
 import com.switchfully.order.domain.customers.CustomerRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
@@ -12,18 +11,13 @@ import java.util.List;
 import static com.switchfully.order.domain.customers.CustomerTestBuilder.aCustomer;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CustomerServiceIntegrationTest extends IntegrationTest{
+class CustomerServiceIntegrationTest extends IntegrationTest {
 
     @Inject
     private CustomerService customerService;
 
     @Inject
     private CustomerRepository customerRepository;
-
-    @AfterEach
-    void resetDatabase() {
-        customerRepository.reset();
-    }
 
     @Test
     void createCustomer() {

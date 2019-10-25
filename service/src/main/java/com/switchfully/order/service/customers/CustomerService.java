@@ -2,10 +2,11 @@ package com.switchfully.order.service.customers;
 
 import com.switchfully.order.domain.customers.Customer;
 import com.switchfully.order.domain.customers.CustomerRepository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +22,7 @@ public class CustomerService {
         this.customerValidator = customerValidator;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public Customer createCustomer(Customer customer) {
         if (!customerValidator.isValidForCreation(customer)) {
             customerValidator.throwInvalidStateException(customer, "creation");
@@ -28,10 +30,12 @@ public class CustomerService {
         return customerRepository.save(customer);
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
     public List<Customer> getAllCustomers() {
-        return new ArrayList<>(customerRepository.getAll().values());
+        return customerRepository.getAll();
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Customer getCustomer(UUID id) {
         return customerRepository.get(id);
     }

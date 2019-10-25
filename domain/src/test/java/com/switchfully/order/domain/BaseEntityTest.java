@@ -8,11 +8,11 @@ import java.util.UUID;
 import static com.switchfully.order.domain.customers.CustomerTestBuilder.aCustomer;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-class EntityTest {
+class BaseEntityTest {
 
     @Test
     void generateId_givenCustomerWithoutId_whenGeneratingId_thenGenerateId() {
-        Entity aCustomer = aCustomer().build();
+        BaseEntity aCustomer = aCustomer().build();
         aCustomer.generateId();
         Assertions.assertThat(aCustomer.getId())
                 .isNotNull()
@@ -22,7 +22,7 @@ class EntityTest {
     @Test
     void generateId_givenCustomerWithId_whenGeneratingId_thenThrowException() {
         UUID id = UUID.randomUUID();
-        Entity customer = aCustomer().withId(id).build();
+        BaseEntity customer = aCustomer().withId(id).build();
 
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(customer::generateId)

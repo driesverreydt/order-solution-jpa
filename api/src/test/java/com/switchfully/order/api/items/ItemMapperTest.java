@@ -48,7 +48,7 @@ class ItemMapperTest {
                 .withAmountOfStock(50520));
 
         assertThat(item)
-                .isEqualToComparingFieldByFieldRecursively(item()
+                .usingRecursiveComparison().isEqualTo(item()
                         .withId(itemId)
                         .withName("Half-Life 3")
                         .withDescription("Boehoehoe")
@@ -80,7 +80,8 @@ class ItemMapperTest {
                 .withAmountOfStock(50520));
 
         assertThat(item)
-                .isEqualToComparingFieldByFieldRecursively(item()
+                .usingRecursiveComparison()
+                .isEqualTo(item()
                         .withId(itemId)
                         .withName("Half-Life 3")
                         .withDescription("Boehoehoe")
@@ -98,7 +99,8 @@ class ItemMapperTest {
                 .withAmountOfStock(50520));
 
         assertThat(item)
-                .isEqualToComparingFieldByFieldRecursively(item()
+                .usingRecursiveComparison()
+                .isEqualTo(item()
                         .withName("Half-Life 3")
                         .withDescription("Boehoehoe")
                         .withPrice(Price.create(BigDecimal.valueOf(45.0)))
@@ -117,7 +119,8 @@ class ItemMapperTest {
                 .withAmountOfStock(50520));
 
         assertThat(item)
-                .isEqualToComparingFieldByFieldRecursively(item()
+                .usingRecursiveComparison()
+                .isEqualTo(item()
                         .withId(id)
                         .withName("Half-Life 3")
                         .withDescription("Boehoehoe")

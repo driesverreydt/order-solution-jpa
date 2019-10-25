@@ -2,10 +2,19 @@ package com.switchfully.order.domain.customers.phonenumbers;
 
 import com.switchfully.order.infrastructure.builder.Builder;
 
+import javax.persistence.Embeddable;
+
+@Embeddable
 public final class PhoneNumber {
 
     private final String number;
     private final String countryCallingCode;
+
+    /** JPA requires a no-arg constructor */
+    private PhoneNumber() {
+        number = null;
+        countryCallingCode = null;
+    }
 
     private PhoneNumber(PhoneNumberBuilder phoneNumberBuilder) {
         this.number = phoneNumberBuilder.number;

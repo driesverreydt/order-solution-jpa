@@ -95,7 +95,7 @@ class OrderMapperTest {
 
         assertThat(orderAfterCreationDto).isNotNull();
         assertThat(orderAfterCreationDto.getOrderId()).isEqualTo(order.getId().toString());
-        assertThat(orderAfterCreationDto.getTotalPrice()).isEqualTo(order.getTotalPrice().getAmountAsFloat());
+        assertThat(orderAfterCreationDto.getTotalPrice()).isEqualTo(order.getTotalPrice().getAmount().floatValue());
     }
 
     @Test
@@ -110,7 +110,7 @@ class OrderMapperTest {
 
         assertThat(ordersReportDto).isNotNull();
         assertThat(ordersReportDto.getTotalPriceOfAllOrders())
-                .isEqualTo(orderItem1.getTotalPrice().getAmountAsFloat());
+                .isEqualTo(orderItem1.getTotalPrice().getAmount().floatValue());
         assertThat(ordersReportDto.getOrders()).hasSize(1);
         assertThat(ordersReportDto.getOrders().get(0)).isNotNull();
         assertThat(ordersReportDto.getOrders().get(0).getOrderId()).isEqualTo(order1.getId().toString());
@@ -133,7 +133,7 @@ class OrderMapperTest {
         assertThat(ordersReportDto.getTotalPriceOfAllOrders())
                 .isEqualTo(Price.add(orderItem3.getTotalPrice(),
                         Price.add(orderItem1.getTotalPrice(), orderItem2.getTotalPrice()))
-                        .getAmountAsFloat());
+                        .getAmount().floatValue());
         assertThat(ordersReportDto.getOrders()).hasSize(2);
     }
 

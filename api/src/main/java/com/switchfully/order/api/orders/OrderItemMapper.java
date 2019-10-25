@@ -47,7 +47,7 @@ public class OrderItemMapper extends Mapper<ItemGroupDto, OrderItem> {
                 .withItemId(orderItem.getItemId().toString())
                 .withOrderedAmount(orderItem.getOrderedAmount())
                 .withName(enrichWithItemName(orderItem))
-                .withTotalPrice(orderItem.getTotalPrice().getAmountAsFloat());
+                .withTotalPrice(orderItem.getTotalPrice().getAmount().floatValue());
     }
 
     private Price enrichWithItemPrice(ItemGroupDto itemGroupDto) {

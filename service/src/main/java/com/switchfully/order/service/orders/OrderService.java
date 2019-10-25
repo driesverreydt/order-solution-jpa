@@ -10,11 +10,12 @@ import com.switchfully.order.domain.orders.orderitems.OrderItem;
 import com.switchfully.order.infrastructure.exceptions.EntityNotFoundException;
 import com.switchfully.order.infrastructure.exceptions.EntityNotValidException;
 import com.switchfully.order.infrastructure.exceptions.NotAuthorizedException;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -40,6 +41,7 @@ public class OrderService {
         this.orderValidator = orderValidator;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public Order createOrder(Order order) {
         assertOrderIsValidForCreation(order);
         assertOrderingCustomerExists(order);
@@ -47,10 +49,12 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
     public List<Order> getOrdersForCustomer(UUID customerId) {
         return orderRepository.getOrdersForCustomer(customerId);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public Order reorderOrder(UUID orderId) {
         Order orderToReorder = orderRepository.get(orderId);
         assertCustomerIsOwnerOfOrderToReorder(orderId, orderToReorder);
@@ -60,15 +64,16 @@ public class OrderService {
                 .build());
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
     public List<Order> getAllOrders(boolean onlyIncludeShippableToday) {
         if (onlyIncludeShippableToday) {
             return getOrdersOnlyContainingOrderItemsShippingToday();
         }
-        return new ArrayList<>(orderRepository.getAll().values());
+        return orderRepository.getAll();
     }
 
     private List<Order> getOrdersOnlyContainingOrderItemsShippingToday() {
-        return orderRepository.getAll().values().stream()
+        return orderRepository.getAll().stream()
                 .map(order -> order()
                         .withCustomerId(order.getCustomerId())
                         .withId(order.getId())

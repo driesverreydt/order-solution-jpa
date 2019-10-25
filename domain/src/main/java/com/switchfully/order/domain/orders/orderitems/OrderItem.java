@@ -3,6 +3,9 @@ package com.switchfully.order.domain.orders.orderitems;
 import com.switchfully.order.domain.items.prices.Price;
 import com.switchfully.order.infrastructure.builder.Builder;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -13,15 +16,31 @@ import java.util.UUID;
  * OrderItem is a fabricated (value) object consisting of the original Item's id and price, enriched with
  * order-specific information (the ordered amount and the shipping date).
  */
+@Embeddable
 public final class OrderItem {
 
-    private final UUID itemId;
-    private final Price itemPrice;
+    @Column(name = "ORDERED_AMOUNT")
     private final int orderedAmount;
+
+    @Column(name = "SHIPPING_DATE")
     private final LocalDate shippingDate;
 
+    @Column(name = "ITEM_ID")
+    private final String itemId;
+
+    @Embedded
+    private final Price itemPrice;
+
+    /** JPA requires a no-arg constructor */
+    private OrderItem() {
+        orderedAmount = 0;
+        shippingDate = null;
+        itemId = null;
+        itemPrice = null;
+    }
+
     public OrderItem(OrderItemBuilder orderItemBuilder, Clock clock) {
-        itemId = orderItemBuilder.itemId;
+        itemId = orderItemBuilder.itemId.toString();
         itemPrice = orderItemBuilder.itemPrice;
         orderedAmount = orderItemBuilder.orderedAmount;
         shippingDate = calculateShippingDate(orderItemBuilder.availableItemStock, clock);
@@ -34,7 +53,7 @@ public final class OrderItem {
     }
 
     public UUID getItemId() {
-        return itemId;
+        return UUID.fromString(itemId);
     }
 
     public Price getItemPrice() {

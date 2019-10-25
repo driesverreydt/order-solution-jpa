@@ -2,9 +2,7 @@ package com.switchfully.order.service.items;
 
 import com.switchfully.order.IntegrationTest;
 import com.switchfully.order.domain.items.Item;
-import com.switchfully.order.domain.items.ItemRepository;
 import com.switchfully.order.domain.items.prices.Price;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
@@ -18,13 +16,6 @@ class ItemServiceIntegrationTest extends IntegrationTest {
 
     @Inject
     private ItemService itemService;
-
-    @Inject private ItemRepository itemRepository;
-
-    @AfterEach
-    void resetDatabase() {
-        itemRepository.reset();
-    }
 
     @Test
     void createItem() {

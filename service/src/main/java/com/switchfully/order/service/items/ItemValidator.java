@@ -21,6 +21,6 @@ public class ItemValidator extends EntityValidator<Item>{
                 || isEmptyOrNull(item.getDescription())
                 || item.getAmountOfStock() < 0
                 || isNull(item.getPrice())
-                    || item.getPrice().getAmountAsFloat() <= 0;
+                    || item.getPrice().getAmount().floatValue() <= 0;
     }
 }

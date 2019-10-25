@@ -1,24 +1,40 @@
 package com.switchfully.order.domain.orders;
 
-import com.switchfully.order.domain.Entity;
+import com.switchfully.order.domain.BaseEntity;
 import com.switchfully.order.domain.items.prices.Price;
 import com.switchfully.order.domain.orders.orderitems.OrderItem;
 import com.switchfully.order.infrastructure.builder.Builder;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class Order extends Entity {
+@Entity
+@Table(name = "ORDR_ORDER")
+public class Order extends BaseEntity {
 
+    @ElementCollection
+    @CollectionTable(name = "ORDR_ORDER_ITEM", joinColumns = @JoinColumn(name = "ORDER_ID"))
+    @AttributeOverrides({
+            @AttributeOverride(name = "itemPrice.amount", column = @Column(name = "ITEM_PRICE_AMOUNT"))
+    })
     private final List<OrderItem> orderItems;
-    private final UUID customerId;
+
+    @Column(name = "CUSTOMER_ID")
+    private final String customerId;
+
+    /** JPA requires a no-arg constructor */
+    private Order() {
+        orderItems = null;
+        customerId = null;
+    }
 
     public Order(OrderBuilder orderBuilder) {
         super(orderBuilder.id);
         orderItems = orderBuilder.orderItems;
-        customerId = orderBuilder.customerId;
+        customerId = orderBuilder.customerId == null ? null : orderBuilder.customerId.toString();
     }
 
     public List<OrderItem> getOrderItems() {
@@ -26,7 +42,10 @@ public class Order extends Entity {
     }
 
     public UUID getCustomerId() {
-        return customerId;
+        if (customerId == null) {
+            return null;
+        }
+        return UUID.fromString(customerId);
     }
 
     public Price getTotalPrice() {

@@ -5,7 +5,6 @@ import com.switchfully.order.domain.items.Item;
 import com.switchfully.order.domain.items.ItemRepository;
 import com.switchfully.order.domain.orders.orderitems.events.OrderItemCreatedEvent;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
@@ -20,11 +19,6 @@ class ItemEventHandlerTest extends IntegrationTest{
 
     @Inject
     private ItemRepository itemRepository;
-
-    @AfterEach
-    void resetDatabase() {
-        itemRepository.reset();
-    }
 
     @Test
     void onApplicationEvent_givenAnOrderItemCreatedEvent_thenUpdateStockOfItem() {

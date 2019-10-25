@@ -29,7 +29,7 @@ public class OrderValidator extends EntityValidator<Order> {
                 .map(orderItem ->
                         isNull(orderItem.getItemId())
                                 || isNull(orderItem.getItemPrice())
-                                || orderItem.getItemPrice().getAmountAsFloat() <= 0
+                                || orderItem.getItemPrice().getAmount().doubleValue() <= 0
                                 || orderItem.getOrderedAmount() <= 0
                                 || isNull(orderItem.getShippingDate()))
                 .filter(isInvalidOrderItem -> isInvalidOrderItem)

@@ -2,6 +2,8 @@ package com.switchfully.order.service.items;
 
 import com.switchfully.order.domain.orders.orderitems.events.OrderItemCreatedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -19,6 +21,7 @@ public class ItemEventHandler {
         }
 
         @Override
+        @Transactional(propagation = Propagation.MANDATORY)
         public void onApplicationEvent(OrderItemCreatedEvent event) {
             itemService.decrementStockForItem(
                     event.getOrderItem().getItemId(),

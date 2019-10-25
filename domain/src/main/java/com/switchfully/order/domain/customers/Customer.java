@@ -1,20 +1,57 @@
 package com.switchfully.order.domain.customers;
 
-import com.switchfully.order.domain.Entity;
+import com.switchfully.order.domain.BaseEntity;
 import com.switchfully.order.domain.customers.addresses.Address;
 import com.switchfully.order.domain.customers.emails.Email;
 import com.switchfully.order.domain.customers.phonenumbers.PhoneNumber;
 import com.switchfully.order.infrastructure.builder.Builder;
 
+import javax.persistence.*;
 import java.util.UUID;
 
-public class Customer extends Entity {
+@Entity
+@Table(name = "ORDR_CUSTOMER")
+public class Customer extends BaseEntity {
 
+    @Column(name = "FIRSTNAME")
     private final String firstname;
+
+    @Column(name = "LASTNAME")
     private final String lastname;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "localPart", column = @Column(name = "EMAIL_LOCAL_PART")),
+            @AttributeOverride(name = "domain", column = @Column(name = "EMAIL_DOMAIN")),
+            @AttributeOverride(name = "complete", column = @Column(name = "EMAIL_COMPLETE"))
+    })
     private final Email email;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "streetName", column = @Column(name = "ADDRESS_STREET_NAME")),
+            @AttributeOverride(name = "houseNumber", column = @Column(name = "ADDRESS_HOUSE_NUMBER")),
+            @AttributeOverride(name = "postalCode", column = @Column(name = "ADDRESS_POSTAL_CODE")),
+            @AttributeOverride(name = "country", column = @Column(name = "ADDRESS_COUNTRY"))
+    })
     private final Address address;
+
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "number", column = @Column(name = "PHONE_NUMBER")),
+            @AttributeOverride(name = "countryCallingCode", column = @Column(name = "PHONE_COUNTRY_CALLING_CODE"))
+    })
     private final PhoneNumber phoneNumber;
+
+    /** JPA requires a no-arg constructor */
+    private Customer() {
+        firstname = null;
+        lastname = null;
+        email = null;
+        address = null;
+        phoneNumber = null;
+    }
 
     private Customer(CustomerBuilder customerBuilder) {
         super(customerBuilder.id);

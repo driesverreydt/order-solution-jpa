@@ -48,7 +48,7 @@ public class OrderMapper {
         return order()
                 .withCustomerId(UUID.fromString(orderCreationDto.getCustomerId()))
                 .withOrderItems(orderCreationDto.getItemGroups().stream()
-                        .map(itemGroup -> orderItemMapper.toDomain(itemGroup))
+                        .map(orderItemMapper::toDomain)
                         .collect(Collectors.toList()))
                 .build();
     }
@@ -56,7 +56,7 @@ public class OrderMapper {
     public OrderAfterCreationDto toOrderAfterCreationDto(Order order) {
         return new OrderAfterCreationDto()
                 .withOrderId(order.getId().toString())
-                .withTotalPrice(order.getTotalPrice().getAmountAsFloat());
+                .withTotalPrice(order.getTotalPrice().getAmount().floatValue());
     }
 
     public OrdersReportDto toOrdersReportDto(List<Order> orders) {
@@ -65,15 +65,15 @@ public class OrderMapper {
                         .map(this::toSingleOrderReportDto)
                         .collect(Collectors.toList()))
                 .withTotalPriceOfAllOrders(orders.stream()
-                        .map(order -> order.getTotalPrice().getAmountAsFloat())
-                        .reduce(0f, (totalPrice1, totalPrice2) -> totalPrice1 + totalPrice2));
+                        .map(order -> order.getTotalPrice().getAmount().floatValue())
+                        .reduce(0f, Float::sum));
     }
 
     private SingleOrderReportDto toSingleOrderReportDto(Order order) {
         return new SingleOrderReportDto()
                 .withOrderId(order.getId().toString())
                 .withItemGroups(order.getOrderItems().stream()
-                        .map(orderItem -> orderItemMapper.toItemGroupReportDto(orderItem))
+                        .map(orderItemMapper::toItemGroupReportDto)
                         .collect(Collectors.toList()));
     }
 }

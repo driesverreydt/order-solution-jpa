@@ -1,17 +1,36 @@
 package com.switchfully.order.domain.items;
 
-import com.switchfully.order.domain.Entity;
+import com.switchfully.order.domain.BaseEntity;
 import com.switchfully.order.domain.items.prices.Price;
 import com.switchfully.order.infrastructure.builder.Builder;
 
+import javax.persistence.*;
 import java.util.UUID;
 
-public class Item extends Entity {
+@Entity
+@Table(name = "ORDR_ITEM")
+public class Item extends BaseEntity {
 
+    @Column(name = "NAME")
     private final String name;
+
+    @Column(name = "DESCRIPTION")
     private final String description;
+
+    @Embedded
+    @AttributeOverride(name = "amount", column = @Column(name = "PRICE_AMOUNT"))
     private final Price price;
+
+    @Column(name = "AMOUNT_OF_STOCK")
     private int amountOfStock;
+
+    /** JPA requires a no-arg constructor */
+    private Item() {
+        name = null;
+        description = null;
+        price = null;
+        amountOfStock = 0;
+    }
 
     public Item(ItemBuilder itemBuilder) {
         super(itemBuilder.id);

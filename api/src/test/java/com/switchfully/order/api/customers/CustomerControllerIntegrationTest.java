@@ -5,10 +5,7 @@ import com.switchfully.order.api.customers.addresses.AddressDto;
 import com.switchfully.order.api.customers.emails.EmailDto;
 import com.switchfully.order.api.customers.phonenumbers.PhoneNumberDto;
 import com.switchfully.order.api.interceptors.ControllerExceptionHandler;
-import com.switchfully.order.domain.customers.Customer;
 import com.switchfully.order.domain.customers.CustomerRepository;
-import com.switchfully.order.domain.customers.CustomerTestBuilder;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
@@ -23,17 +20,85 @@ class CustomerControllerIntegrationTest extends ControllerIntegrationTest {
     @Inject
     private CustomerRepository customerRepository;
 
-    @Inject
-    private CustomerMapper customerMapper;
-
-    @AfterEach
-    void resetDatabase() {
-        customerRepository.reset();
+    @Override
+    public void clearDatabase() {
+        customerRepository.getEntityManager().createQuery("DELETE FROM Customer").executeUpdate();
     }
 
     @Test
     void createCustomer() {
-        CustomerDto customerToCreate = new CustomerDto()
+        CustomerDto createdCustomer = new TestRestTemplate()
+                .postForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME), createACustomer(), CustomerDto.class);
+
+        assertCustomerIsEqualIgnoringId(createACustomer(), createdCustomer);
+    }
+
+    @Test
+    void createCustomer_givenCustomerNotValidForCreationBecauseOfMissingFirstName_thenErrorObjectReturnedByControllerExceptionHandler() {
+        CustomerDto customerToCreate = createACustomer().withFirstname(null);
+
+        ControllerExceptionHandler.Error error = new TestRestTemplate()
+                .postForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME), customerToCreate, ControllerExceptionHandler.Error.class);
+
+        assertThat(error).isNotNull();
+        assertThat(error.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(error.getUniqueErrorId()).isNotNull().isNotEmpty();
+        assertThat(error.getMessage()).contains("Invalid Customer provided for creation. " +
+                "Provided object: Customer{id=");
+    }
+
+    @Test
+    void getAllCustomers_given2CreatedCustomers_whenGetAllCustomers_thenReturnAllCustomers() {
+        new TestRestTemplate()
+                .postForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME),
+                        createACustomer(), CustomerDto.class);
+        new TestRestTemplate()
+                .postForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME),
+                        createACustomer(), CustomerDto.class);
+
+        CustomerDto[] allCustomers = new TestRestTemplate()
+                .getForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME), CustomerDto[].class);
+
+        assertThat(allCustomers).hasSize(2);
+    }
+
+    @Test
+    void getAllCustomers__assertResultIsCorrectlyReturned() {
+        CustomerDto customerInDb = new TestRestTemplate()
+                .postForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME),
+                        createACustomer(), CustomerDto.class);
+
+        CustomerDto[] allCustomers = new TestRestTemplate()
+                .getForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME), CustomerDto[].class);
+
+        assertThat(allCustomers).hasSize(1);
+        assertThat(allCustomers[0])
+                .usingRecursiveComparison()
+                .isEqualTo(customerInDb);
+    }
+
+    @Test
+    void getCustomer_given3CreatedCustomers_whenGetSpecificCustomer_thenReturnOnlyThatCustomer() {
+        new TestRestTemplate()
+                .postForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME),
+                        createACustomer(), CustomerDto.class);
+        CustomerDto customerToFind = new TestRestTemplate()
+                .postForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME),
+                        createACustomer().withFirstname("Minion"), CustomerDto.class);
+        new TestRestTemplate()
+                .postForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME),
+                        createACustomer(), CustomerDto.class);
+
+        CustomerDto foundCustomer = new TestRestTemplate()
+                .getForObject(format("http://localhost:%s/%s/%s", getPort(), CustomerController.RESOURCE_NAME, customerToFind.getId()), CustomerDto.class);
+
+        assertThat(foundCustomer)
+                .usingRecursiveComparison()
+                .isEqualTo(customerToFind);
+    }
+
+    private CustomerDto createACustomer() {
+        return new CustomerDto()
                 .withFirstname("Bruce")
                 .withLastname("Wayne")
                 .withEmail(new EmailDto()
@@ -48,78 +113,6 @@ class CustomerControllerIntegrationTest extends ControllerIntegrationTest {
                         .withHouseNumber("841")
                         .withPostalCode("1238")
                         .withCountry("GothamCountry"));
-
-        CustomerDto createdCustomer = new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME), customerToCreate, CustomerDto.class);
-
-        assertCustomerIsEqualIgnoringId(customerToCreate, createdCustomer);
-    }
-
-    @Test
-    void createCustomer_givenCustomerNotValidForCreationBecauseOfMissingFirstName_thenErrorObjectReturnedByControllerExceptionHandler() {
-        CustomerDto customerToCreate = new CustomerDto()
-                .withFirstname(null)
-                .withLastname("Wayne")
-                .withEmail(new EmailDto()
-                        .withLocalPart("brucy")
-                        .withDomain("bat.net")
-                        .withComplete("brucy@bat.net"))
-                .withPhoneNumber(new PhoneNumberDto()
-                        .withNumber("485212121")
-                        .withCountryCallingCode("+32"))
-                .withAddress(new AddressDto()
-                        .withStreetName("Secretstreet")
-                        .withHouseNumber("841")
-                        .withPostalCode("1238")
-                        .withCountry("GothamCountry"));
-
-        ControllerExceptionHandler.Error error = new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME), customerToCreate, ControllerExceptionHandler.Error.class);
-
-        assertThat(error).isNotNull();
-        assertThat(error.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(error.getUniqueErrorId()).isNotNull().isNotEmpty();
-        assertThat(error.getMessage()).contains("Invalid Customer provided for creation. " +
-                "Provided object: Customer{id=");
-    }
-
-    @Test
-    void getAllCustomers() {
-        customerRepository.save(CustomerTestBuilder.aCustomer().build());
-        customerRepository.save(CustomerTestBuilder.aCustomer().build());
-        customerRepository.save(CustomerTestBuilder.aCustomer().build());
-
-        CustomerDto[] allCustomers = new TestRestTemplate()
-                .getForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME), CustomerDto[].class);
-
-        assertThat(allCustomers).hasSize(3);
-    }
-
-    @Test
-    void getAllCustomers_assertResultIsCorrectlyReturned() {
-        Customer customerInDb = customerRepository.save(CustomerTestBuilder.aCustomer().build());
-
-        CustomerDto[] allCustomers = new TestRestTemplate()
-                .getForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME), CustomerDto[].class);
-
-        assertThat(allCustomers).hasSize(1);
-        assertThat(allCustomers[0])
-                .usingRecursiveComparison()
-                    .isEqualTo(customerMapper.toDto(customerInDb));
-    }
-
-    @Test
-    void getCustomer() {
-        customerRepository.save(CustomerTestBuilder.aCustomer().build());
-        Customer customerToFind = customerRepository.save(CustomerTestBuilder.aCustomer().build());
-        customerRepository.save(CustomerTestBuilder.aCustomer().build());
-
-        CustomerDto foundCustomer = new TestRestTemplate()
-                .getForObject(format("http://localhost:%s/%s/%s", getPort(), CustomerController.RESOURCE_NAME, customerToFind.getId().toString()), CustomerDto.class);
-
-        assertThat(foundCustomer)
-                .usingRecursiveComparison()
-                    .isEqualTo(customerMapper.toDto(customerToFind));
     }
 
     private void assertCustomerIsEqualIgnoringId(CustomerDto customerToCreate, CustomerDto createdCustomer) {
