@@ -31,6 +31,20 @@ class CustomerServiceIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    void updateCustomer() {
+        Customer createdCustomer = customerService.createCustomer(aCustomer().withLastname("Brook").build());
+
+        Customer updatedCustomer = customerService.updateCustomer(aCustomer().
+                withId(createdCustomer.getId())
+                .withFirstname("Jaimes")
+                .withLastname(createdCustomer.getLastname()).build());
+
+        assertThat(updatedCustomer.getId()).isEqualTo(createdCustomer.getId());
+        assertThat(updatedCustomer.getFirstname()).isEqualTo("Jaimes");
+        assertThat(updatedCustomer.getLastname()).isEqualTo("Brook");
+    }
+
+    @Test
     void getAllCustomers() {
         Customer customer1 = customerService.createCustomer(aCustomer().build());
         Customer customer2 = customerService.createCustomer(aCustomer().build());

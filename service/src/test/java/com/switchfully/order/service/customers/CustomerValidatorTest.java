@@ -1,5 +1,6 @@
 package com.switchfully.order.service.customers;
 
+import com.switchfully.order.domain.customers.Customer;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -41,6 +42,22 @@ class CustomerValidatorTest {
                         .withLastname(null)
                         .withEmail(null)
                         .build()))
+                .isFalse();
+    }
+
+    @Test
+    void isValidForUpdating_happyPath() {
+        Customer customer = aCustomer().withId(UUID.randomUUID()).build();
+
+        assertThat(new CustomerValidator()
+                .isValidForUpdating(customer))
+                .isTrue();
+    }
+
+    @Test
+    void isValidForUpdating_givenNoId_thenNotValidForUpdating() {
+        assertThat(new CustomerValidator()
+                .isValidForUpdating(aCustomer().build()))
                 .isFalse();
     }
 

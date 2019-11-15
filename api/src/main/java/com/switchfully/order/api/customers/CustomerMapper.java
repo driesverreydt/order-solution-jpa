@@ -24,6 +24,17 @@ public class CustomerMapper extends Mapper<CustomerDto, Customer> {
         this.phoneNumberMapper = phoneNumberMapper;
     }
 
+    public Customer toDomain(UUID customerId, CustomerDto customerDto) {
+        if(customerDto.getId() == null) {
+            return toDomain(customerDto.withId(customerId));
+        }
+        if(!customerId.toString().equals(customerDto.getId())) {
+            throw new IllegalArgumentException("When updating a customer, the provided ID in the path should match the ID in the body: " +
+                    "ID in path = " + customerId.toString() + ", ID in body = " + customerDto.getId());
+        }
+        return toDomain(customerDto);
+    }
+
     @Override
     public CustomerDto toDto(Customer customer) {
         return new CustomerDto()
