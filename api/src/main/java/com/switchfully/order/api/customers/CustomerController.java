@@ -17,11 +17,13 @@ public class CustomerController {
 
     private final CustomerService customerService;
     private final CustomerMapper customerMapper;
+    private final CustomerOverviewMapper customerOverviewMapper;
 
     @Inject
-    public CustomerController(CustomerService customerService, CustomerMapper customerMapper) {
+    public CustomerController(CustomerService customerService, CustomerMapper customerMapper, CustomerOverviewMapper customerOverviewMapper) {
         this.customerService = customerService;
         this.customerMapper = customerMapper;
+        this.customerOverviewMapper = customerOverviewMapper;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -32,9 +34,9 @@ public class CustomerController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<CustomerDto> getAllCustomers() {
+    public List<CustomerOverviewDto> getAllCustomers() {
         return customerService.getAllCustomers().stream()
-                .map(customerMapper::toDto)
+                .map(customerOverviewMapper::toDto)
                 .collect(Collectors.toList());
     }
 

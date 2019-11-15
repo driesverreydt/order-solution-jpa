@@ -56,8 +56,8 @@ class CustomerControllerIntegrationTest extends ControllerIntegrationTest {
                 .postForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME),
                         createACustomer(), CustomerDto.class);
 
-        CustomerDto[] allCustomers = new TestRestTemplate()
-                .getForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME), CustomerDto[].class);
+        CustomerOverviewDto[] allCustomers = new TestRestTemplate()
+                .getForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME), CustomerOverviewDto[].class);
 
         assertThat(allCustomers).hasSize(2);
     }
@@ -68,12 +68,13 @@ class CustomerControllerIntegrationTest extends ControllerIntegrationTest {
                 .postForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME),
                         createACustomer(), CustomerDto.class);
 
-        CustomerDto[] allCustomers = new TestRestTemplate()
-                .getForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME), CustomerDto[].class);
+        CustomerOverviewDto[] allCustomers = new TestRestTemplate()
+                .getForObject(format("http://localhost:%s/%s", getPort(), CustomerController.RESOURCE_NAME), CustomerOverviewDto[].class);
 
         assertThat(allCustomers).hasSize(1);
         assertThat(allCustomers[0])
                 .usingRecursiveComparison()
+                .ignoringFields("email", "address", "phoneNumber")
                 .isEqualTo(customerInDb);
     }
 
