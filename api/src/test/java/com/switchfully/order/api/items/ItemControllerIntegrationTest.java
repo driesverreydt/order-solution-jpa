@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ItemControllerIntegrationTest extends ControllerIntegrationTest {
 
+    private static final String HTTP_LOCALHOST = "http://localhost";
     @Inject
     private ItemRepository itemRepository;
 
@@ -30,32 +31,44 @@ class ItemControllerIntegrationTest extends ControllerIntegrationTest {
     @Test
     void createItem() {
         ItemDto itemDto = new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME), createAnItem(), ItemDto.class);
+                .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME), createAnItem(), ItemDto.class);
 
         assertThat(itemDto.getId()).isNotNull().isNotEmpty();
         assertThat(itemDto).isEqualToIgnoringGivenFields(createAnItem(), "id", "stockUrgency");
     }
 
     @Test
+    void getItem() {
+        ItemDto createdItemDto = new TestRestTemplate()
+                .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
+                        createAnItem().withAmountOfStock(12), ItemDto.class);
+
+        ItemDto foundItemDto = new TestRestTemplate()
+                .getForObject(format(HTTP_LOCALHOST + ":%s/%s/%s", getPort(), ItemController.RESOURCE_NAME, createdItemDto.getId()), ItemDto.class);
+
+        assertThat(foundItemDto).isEqualToComparingFieldByField(createdItemDto);
+    }
+
+    @Test
     void getAllItems() {
         ItemDto item1 = new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME),
+                .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
                         createAnItem().withAmountOfStock(12), ItemDto.class);
         ItemDto item2 = new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME),
+                .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
                         createAnItem().withAmountOfStock(2), ItemDto.class);
         ItemDto item3 = new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME),
+                .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
                         createAnItem().withAmountOfStock(16), ItemDto.class);
         ItemDto item4 = new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME),
+                .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
                         createAnItem().withAmountOfStock(8), ItemDto.class);
         ItemDto item5 = new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME),
+                .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
                         createAnItem().withAmountOfStock(4), ItemDto.class);
 
         ItemDto[] items = new TestRestTemplate()
-                .getForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME), ItemDto[].class);
+                .getForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME), ItemDto[].class);
 
         assertThat(items).hasSize(5);
         assertThat(items[0]).usingRecursiveComparison().ignoringFields("description").isEqualTo(item2);
@@ -68,23 +81,23 @@ class ItemControllerIntegrationTest extends ControllerIntegrationTest {
     @Test
     void getAllItems_givenAStockUrgencyFilter_thenOnlyReturnItemsWithThatUrgency() {
         ItemDto item1 = new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME),
+                .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
                         createAnItem().withAmountOfStock(12), ItemDto.class);
         ItemDto item2 = new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME),
+                .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
                         createAnItem().withAmountOfStock(20), ItemDto.class);
         new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME),
+                .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
                         createAnItem().withAmountOfStock(8), ItemDto.class);
         ItemDto item4 = new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME),
+                .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
                         createAnItem().withAmountOfStock(16), ItemDto.class);
         new TestRestTemplate()
-                .postForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME),
+                .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
                         createAnItem().withAmountOfStock(4), ItemDto.class);
 
         ItemDto[] items = new TestRestTemplate()
-                .getForObject(format("http://localhost:%s/%s?stockUrgency=STOCK_HIGH", getPort(),
+                .getForObject(format(HTTP_LOCALHOST + ":%s/%s?stockUrgency=STOCK_HIGH", getPort(),
                         ItemController.RESOURCE_NAME), ItemDto[].class);
 
         assertThat(items).hasSize(3);
@@ -110,7 +123,7 @@ class ItemControllerIntegrationTest extends ControllerIntegrationTest {
                 .withAmountOfStock(10);
 
         ResponseEntity<ItemDto> result = new TestRestTemplate()
-                .exchange(format("http://localhost:%s/%s/%s", getPort(), ItemController.RESOURCE_NAME, alreadyExistingItem.getId().toString()),
+                .exchange(format(HTTP_LOCALHOST + ":%s/%s/%s", getPort(), ItemController.RESOURCE_NAME, alreadyExistingItem.getId().toString()),
                         HttpMethod.PUT,
                         new HttpEntity<>(itemToUpdate),
                         ItemDto.class);

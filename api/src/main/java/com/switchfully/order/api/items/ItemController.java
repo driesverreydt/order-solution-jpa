@@ -42,6 +42,12 @@ public class ItemController {
                         itemMapper.toDomain(UUID.fromString(id), itemDto)));
     }
 
+    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ItemDto getItem(@PathVariable String id) {
+        return itemMapper.toDto(
+                itemService.getItem(UUID.fromString(id)));
+    }
+
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ItemOverviewDto> getAllItems(@RequestParam(name = "stockUrgency", required = false) String stockUrgency) {
         List<ItemOverviewDto> allItems = itemService.getAllItems().stream()
@@ -52,7 +58,7 @@ public class ItemController {
     }
 
     private List<ItemOverviewDto> filterOnStockUrgency(String stockUrgency, List<ItemOverviewDto> allItems) {
-        if(stockUrgency != null) {
+        if (stockUrgency != null) {
             StockUrgency stockUrgencyToFilterOn = StockUrgency.valueOf(stockUrgency);
             return allItems.stream()
                     .filter(item -> StockUrgency.valueOf(item.getStockUrgency()).equals(stockUrgencyToFilterOn))
