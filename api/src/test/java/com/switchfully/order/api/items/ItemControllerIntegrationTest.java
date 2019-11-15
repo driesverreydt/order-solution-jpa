@@ -67,8 +67,8 @@ class ItemControllerIntegrationTest extends ControllerIntegrationTest {
                 .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
                         createAnItem().withAmountOfStock(4), ItemDto.class);
 
-        ItemDto[] items = new TestRestTemplate()
-                .getForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME), ItemDto[].class);
+        ItemOverviewDto[] items = new TestRestTemplate()
+                .getForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME), ItemOverviewDto[].class);
 
         assertThat(items).hasSize(5);
         assertThat(items[0]).usingRecursiveComparison().ignoringFields("description").isEqualTo(item2);
@@ -96,9 +96,9 @@ class ItemControllerIntegrationTest extends ControllerIntegrationTest {
                 .postForObject(format(HTTP_LOCALHOST + ":%s/%s", getPort(), ItemController.RESOURCE_NAME),
                         createAnItem().withAmountOfStock(4), ItemDto.class);
 
-        ItemDto[] items = new TestRestTemplate()
+        ItemOverviewDto[] items = new TestRestTemplate()
                 .getForObject(format(HTTP_LOCALHOST + ":%s/%s?stockUrgency=STOCK_HIGH", getPort(),
-                        ItemController.RESOURCE_NAME), ItemDto[].class);
+                        ItemController.RESOURCE_NAME), ItemOverviewDto[].class);
 
         assertThat(items).hasSize(3);
         assertThat(items[0]).usingRecursiveComparison().ignoringFields("description").isEqualTo(item1);
