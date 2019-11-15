@@ -45,4 +45,5 @@ public class ItemMapper extends Mapper<ItemDto, Item> {
                 .withPrice(item.getPrice().getAmount().floatValue())
                 .withStockUrgency(item.getStockUrgency().name());
     }
+
 }

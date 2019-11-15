@@ -19,11 +19,13 @@ public class ItemController {
 
     private final ItemService itemService;
     private final ItemMapper itemMapper;
+    private final ItemOverviewMapper itemOverviewMapper;
 
     @Inject
-    public ItemController(ItemService itemService, ItemMapper itemMapper) {
+    public ItemController(ItemService itemService, ItemMapper itemMapper, ItemOverviewMapper itemOverviewMapper) {
         this.itemService = itemService;
         this.itemMapper = itemMapper;
+        this.itemOverviewMapper = itemOverviewMapper;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -41,15 +43,15 @@ public class ItemController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ItemDto> getAllItems(@RequestParam(name = "stockUrgency", required = false) String stockUrgency) {
-        List<ItemDto> allItems = itemService.getAllItems().stream()
-                .map(item -> itemMapper.toDto(item))
-                .sorted(Comparator.comparingInt(ItemDto::getAmountOfStock))
+    public List<ItemOverviewDto> getAllItems(@RequestParam(name = "stockUrgency", required = false) String stockUrgency) {
+        List<ItemOverviewDto> allItems = itemService.getAllItems().stream()
+                .map(itemOverviewMapper::toDto)
+                .sorted(Comparator.comparingInt(ItemOverviewDto::getAmountOfStock))
                 .collect(Collectors.toList());
         return filterOnStockUrgency(stockUrgency, allItems);
     }
 
-    private List<ItemDto> filterOnStockUrgency(@RequestParam(name = "stockUrgency") String stockUrgency, List<ItemDto> allItems) {
+    private List<ItemOverviewDto> filterOnStockUrgency(String stockUrgency, List<ItemOverviewDto> allItems) {
         if(stockUrgency != null) {
             StockUrgency stockUrgencyToFilterOn = StockUrgency.valueOf(stockUrgency);
             return allItems.stream()

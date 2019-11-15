@@ -58,11 +58,11 @@ class ItemControllerIntegrationTest extends ControllerIntegrationTest {
                 .getForObject(format("http://localhost:%s/%s", getPort(), ItemController.RESOURCE_NAME), ItemDto[].class);
 
         assertThat(items).hasSize(5);
-        assertThat(items[0]).usingRecursiveComparison().isEqualTo(item2);
-        assertThat(items[1]).usingRecursiveComparison().isEqualTo(item5);
-        assertThat(items[2]).usingRecursiveComparison().isEqualTo(item4);
-        assertThat(items[3]).usingRecursiveComparison().isEqualTo(item1);
-        assertThat(items[4]).usingRecursiveComparison().isEqualTo(item3);
+        assertThat(items[0]).usingRecursiveComparison().ignoringFields("description").isEqualTo(item2);
+        assertThat(items[1]).usingRecursiveComparison().ignoringFields("description").isEqualTo(item5);
+        assertThat(items[2]).usingRecursiveComparison().ignoringFields("description").isEqualTo(item4);
+        assertThat(items[3]).usingRecursiveComparison().ignoringFields("description").isEqualTo(item1);
+        assertThat(items[4]).usingRecursiveComparison().ignoringFields("description").isEqualTo(item3);
     }
 
     @Test
@@ -88,9 +88,9 @@ class ItemControllerIntegrationTest extends ControllerIntegrationTest {
                         ItemController.RESOURCE_NAME), ItemDto[].class);
 
         assertThat(items).hasSize(3);
-        assertThat(items[0]).usingRecursiveComparison().isEqualTo(item1);
-        assertThat(items[1]).usingRecursiveComparison().isEqualTo(item4);
-        assertThat(items[2]).usingRecursiveComparison().isEqualTo(item2);
+        assertThat(items[0]).usingRecursiveComparison().ignoringFields("description").isEqualTo(item1);
+        assertThat(items[1]).usingRecursiveComparison().ignoringFields("description").isEqualTo(item4);
+        assertThat(items[2]).usingRecursiveComparison().ignoringFields("description").isEqualTo(item2);
     }
 
     @Test
