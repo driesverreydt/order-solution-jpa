@@ -19,7 +19,7 @@ import static com.switchfully.order.domain.items.ItemTestBuilder.anItem;
 import static com.switchfully.order.domain.orders.OrderTestBuilder.anOrder;
 import static com.switchfully.order.domain.orders.orderitems.OrderItemTestBuilder.anOrderItem;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 
 class OrderServiceTest {
 
