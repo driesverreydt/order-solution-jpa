@@ -36,7 +36,7 @@ public class Application {
      * Generates some sample / dummy data
      */
     @Bean
-    @Profile(value = "!production")
+    @Profile(value = "dev")
     public CommandLineRunner commandLineRunner(CustomerService customerService, ItemService itemService, OrderService orderService) {
         return (args) -> {
             Customer customerFiona = customerService.createCustomer(customer()
