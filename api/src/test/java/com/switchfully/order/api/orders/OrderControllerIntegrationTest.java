@@ -40,6 +40,7 @@ class OrderControllerIntegrationTest extends ControllerIntegrationTest {
 
     @Override
     public void clearDatabase() {
+        orderRepository.getEntityManager().createNativeQuery("DELETE FROM ORDR_ORDER_ITEM").executeUpdate();
         orderRepository.getEntityManager().createQuery("DELETE FROM Order").executeUpdate();
         itemRepository.getEntityManager().createQuery("DELETE FROM Item").executeUpdate();
         customerRepository.getEntityManager().createQuery("DELETE FROM Customer").executeUpdate();
