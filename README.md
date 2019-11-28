@@ -16,11 +16,10 @@ www.switchfully.com
 ## Usage
 
 ### Running Locally
-- Edit the `application.properties` to connect to your own postgreSQL database.
-- Run `mvn clean install` to verify the project compiles and all tests run.
 - Multiple ways of running:
     - Run `Application.java` inside the IDE
-    - Or, Inside the target folder of module `war`, run the `war-1.0-SNAPSHOT.jar` using the `java -jar` command
+    - Or, Inside the target folder of module `war`, run the `war-1.0-SNAPSHOT.jar` using the `java -jar` command.
+        - But first, you will have to run command `mvn clean package` to generate the `.jar` file.
     - Or, execute command `mvn spring-boot:run` from inside module (folder) `war`
 - Surf to `http://localhost:9000/customers` to verify the backend is running.
 
