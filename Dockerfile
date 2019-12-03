@@ -3,6 +3,7 @@
 # ====================================================================
 # 1. Build an image from this Dockerfile using the following command:
 #       >_ docker build -t com.switchfully/order-backend-app .
+#          (where . stands for the current directory)
 #          (where we tag (-t) our image giving it the unique name com.switchfully/order-backend-app (with version 'latest'))
 #               https://docs.docker.com/engine/reference/commandline/build/#tag-an-image--t
 # 2. Run one (or more) docker container(s) from the created image, using command:
@@ -21,6 +22,7 @@
 #          (where -a order-jpa specifies the name of the app on heroku)
 #          (where web is the process-type)
 #       >_ heroku container:release web -a order-jpa
+#       Runs on: https://order-jpa.herokuapp.com/swagger-ui.html
 
 # Start with a base image containing Java runtime
 FROM openjdk:11-jre-slim
