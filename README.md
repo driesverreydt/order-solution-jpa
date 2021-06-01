@@ -10,7 +10,7 @@ www.switchfully.com
     - REST
     - ORM & JPA
         - No use of Spring Data Repositories
-- JDK 12
+- JDK 15
 - Contains a full working solution of Örder.
 
 ## Usage
